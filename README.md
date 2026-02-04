@@ -9,7 +9,7 @@ This project is inspired by:
 *Muthukumaran et al. (2023), “A Hybrid Machine Learning Model with Combined Wrapper Feature Selection Techniques to Improve the Yield of Paddy”*.
 
 
-## Business Context (Why this matters)
+## Business Context
 Agricultural decision-makers (farmers, cooperatives, or government agencies) often have limited resources for support (fertilizer guidance,
 irrigation planning, pest control). A numeric yield prediction is less useful if it does not tell **where to intervene first**.
 
@@ -60,7 +60,7 @@ Baseline + improved models:
 - Random Forest (robust nonlinear model)
 - (Optional) Gradient Boosting / XGBoost
 
-### 4) Evaluation (enterprise-oriented)
+### 4) Evaluation
 We focus on metrics that matter for **risk detection**:
 - Recall for the **High-Risk** class (avoid missed interventions)
 - Precision for the **High-Risk** class (avoid wasted interventions)
