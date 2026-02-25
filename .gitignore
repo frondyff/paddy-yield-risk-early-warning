@@ -29,5 +29,16 @@ outputs/*
 !outputs/.gitkeep
 !outputs/baseline/
 !outputs/baseline/.gitkeep
+!outputs/baseline/**
 !outputs/feature_prepare/
 !outputs/feature_prepare/.gitkeep
+!outputs/feature_prepare/**
+!outputs/model_compare/
+!outputs/model_compare/**
+!outputs/model_select_tune/
+!outputs/model_select_tune/**
+!outputs/ablation_eval/
+!outputs/ablation_eval/**
+!outputs/interpretability/
+!outputs/interpretability/**
+!outputs/run_all_manifest.json

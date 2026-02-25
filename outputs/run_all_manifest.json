@@ -1,0 +1,11 @@
+{
+  "data_path": "/home/frondy/code/paddy-yield-ml-enterprise/data/raw/paddydataset.csv",
+  "outputs": {
+    "baseline": "/home/frondy/code/paddy-yield-ml-enterprise/outputs/baseline",
+    "feature_prepare": "/home/frondy/code/paddy-yield-ml-enterprise/outputs/feature_prepare",
+    "model_compare": "/home/frondy/code/paddy-yield-ml-enterprise/outputs/model_compare",
+    "model_select_tune": "/home/frondy/code/paddy-yield-ml-enterprise/outputs/model_select_tune",
+    "ablation_eval": "/home/frondy/code/paddy-yield-ml-enterprise/outputs/ablation_eval",
+    "interpretability": "/home/frondy/code/paddy-yield-ml-enterprise/outputs/interpretability"
+  }
+}
