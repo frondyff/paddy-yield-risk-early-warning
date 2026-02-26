@@ -7,6 +7,7 @@ import itertools
 import json
 import time
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -27,6 +28,20 @@ OUT_DIR = project_root / "outputs" / "carob_model_tune_top2"
 CANDIDATES_PATH = project_root / "outputs" / "carob_feature_prepare" / "hybrid_selection_candidates.csv"
 DEFAULT_SCENARIO = "modifiable_plus_context"
 DEFAULT_MODELS = "extratrees,catboost"
+
+
+def as_int(value: object, *, name: str) -> int:
+    try:
+        return int(cast("int | float | str", value))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Expected integer-like value for {name}, got {value!r}") from exc
+
+
+def as_float(value: object, *, name: str) -> float:
+    try:
+        return float(cast("int | float | str", value))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Expected float-like value for {name}, got {value!r}") from exc
 
 
 def parse_seeds(raw: str) -> list[int]:
@@ -82,15 +97,15 @@ def refine_et_grid(best: dict[str, object]) -> list[dict[str, object]]:
     depth = b["max_depth"]
     candidates = [
         b,
-        {**b, "n_estimators": max(200, int(b["n_estimators"]) - 200)},
-        {**b, "n_estimators": min(1200, int(b["n_estimators"]) + 200)},
+        {**b, "n_estimators": max(200, as_int(b["n_estimators"], name="n_estimators") - 200)},
+        {**b, "n_estimators": min(1200, as_int(b["n_estimators"], name="n_estimators") + 200)},
         {**b, "max_depth": None if depth is not None else 16},
-        {**b, "max_depth": 12 if depth is None else max(6, int(depth) - 2)},
-        {**b, "max_depth": 16 if depth is None else min(24, int(depth) + 2)},
-        {**b, "min_samples_leaf": max(1, int(b["min_samples_leaf"]) - 1)},
-        {**b, "min_samples_leaf": min(8, int(b["min_samples_leaf"]) + 1)},
-        {**b, "min_samples_split": max(2, int(b["min_samples_split"]) - 2)},
-        {**b, "min_samples_split": min(16, int(b["min_samples_split"]) + 2)},
+        {**b, "max_depth": 12 if depth is None else max(6, as_int(depth, name="max_depth") - 2)},
+        {**b, "max_depth": 16 if depth is None else min(24, as_int(depth, name="max_depth") + 2)},
+        {**b, "min_samples_leaf": max(1, as_int(b["min_samples_leaf"], name="min_samples_leaf") - 1)},
+        {**b, "min_samples_leaf": min(8, as_int(b["min_samples_leaf"], name="min_samples_leaf") + 1)},
+        {**b, "min_samples_split": max(2, as_int(b["min_samples_split"], name="min_samples_split") - 2)},
+        {**b, "min_samples_split": min(16, as_int(b["min_samples_split"], name="min_samples_split") + 2)},
         {**b, "max_features": "sqrt"},
         {**b, "max_features": "log2"},
         {**b, "max_features": 0.8},
@@ -126,18 +141,24 @@ def refine_cat_grid(best: dict[str, object]) -> list[dict[str, object]]:
     b = best.copy()
     candidates = [
         b,
-        {**b, "n_estimators": max(200, int(b["n_estimators"]) - 100)},
-        {**b, "n_estimators": min(1200, int(b["n_estimators"]) + 100)},
-        {**b, "learning_rate": max(0.01, float(b["learning_rate"]) * 0.8)},
-        {**b, "learning_rate": min(0.2, float(b["learning_rate"]) * 1.2)},
-        {**b, "depth": max(3, int(b["depth"]) - 1)},
-        {**b, "depth": min(10, int(b["depth"]) + 1)},
-        {**b, "l2_leaf_reg": max(1.0, float(b["l2_leaf_reg"]) * 0.7)},
-        {**b, "l2_leaf_reg": float(b["l2_leaf_reg"]) * 1.5},
-        {**b, "random_strength": max(0.1, float(b["random_strength"]) * 0.7)},
-        {**b, "random_strength": float(b["random_strength"]) * 1.5},
-        {**b, "bagging_temperature": max(0.0, float(b["bagging_temperature"]) - 0.5)},
-        {**b, "bagging_temperature": min(3.0, float(b["bagging_temperature"]) + 0.5)},
+        {**b, "n_estimators": max(200, as_int(b["n_estimators"], name="n_estimators") - 100)},
+        {**b, "n_estimators": min(1200, as_int(b["n_estimators"], name="n_estimators") + 100)},
+        {**b, "learning_rate": max(0.01, as_float(b["learning_rate"], name="learning_rate") * 0.8)},
+        {**b, "learning_rate": min(0.2, as_float(b["learning_rate"], name="learning_rate") * 1.2)},
+        {**b, "depth": max(3, as_int(b["depth"], name="depth") - 1)},
+        {**b, "depth": min(10, as_int(b["depth"], name="depth") + 1)},
+        {**b, "l2_leaf_reg": max(1.0, as_float(b["l2_leaf_reg"], name="l2_leaf_reg") * 0.7)},
+        {**b, "l2_leaf_reg": as_float(b["l2_leaf_reg"], name="l2_leaf_reg") * 1.5},
+        {**b, "random_strength": max(0.1, as_float(b["random_strength"], name="random_strength") * 0.7)},
+        {**b, "random_strength": as_float(b["random_strength"], name="random_strength") * 1.5},
+        {
+            **b,
+            "bagging_temperature": max(0.0, as_float(b["bagging_temperature"], name="bagging_temperature") - 0.5),
+        },
+        {
+            **b,
+            "bagging_temperature": min(3.0, as_float(b["bagging_temperature"], name="bagging_temperature") + 0.5),
+        },
     ]
     dedup = {json.dumps(c, sort_keys=True): c for c in candidates}
     return list(dedup.values())
@@ -145,23 +166,24 @@ def refine_cat_grid(best: dict[str, object]) -> list[dict[str, object]]:
 
 def build_model(model_key: str, params: dict[str, object], seed: int) -> object:
     if model_key == "extratrees":
+        max_depth_raw = params["max_depth"]
         return ExtraTreesRegressor(
-            n_estimators=int(params["n_estimators"]),
-            max_depth=(None if params["max_depth"] is None else int(params["max_depth"])),
-            min_samples_leaf=int(params["min_samples_leaf"]),
-            min_samples_split=int(params["min_samples_split"]),
+            n_estimators=as_int(params["n_estimators"], name="n_estimators"),
+            max_depth=(None if max_depth_raw is None else as_int(max_depth_raw, name="max_depth")),
+            min_samples_leaf=as_int(params["min_samples_leaf"], name="min_samples_leaf"),
+            min_samples_split=as_int(params["min_samples_split"], name="min_samples_split"),
             max_features=params["max_features"],
             random_state=seed,
             n_jobs=-1,
         )
     if model_key == "catboost":
         return CatBoostRegressor(
-            n_estimators=int(params["n_estimators"]),
-            learning_rate=float(params["learning_rate"]),
-            depth=int(params["depth"]),
-            l2_leaf_reg=float(params["l2_leaf_reg"]),
-            random_strength=float(params.get("random_strength", 1.0)),
-            bagging_temperature=float(params.get("bagging_temperature", 0.0)),
+            n_estimators=as_int(params["n_estimators"], name="n_estimators"),
+            learning_rate=as_float(params["learning_rate"], name="learning_rate"),
+            depth=as_int(params["depth"], name="depth"),
+            l2_leaf_reg=as_float(params["l2_leaf_reg"], name="l2_leaf_reg"),
+            random_strength=as_float(params.get("random_strength", 1.0), name="random_strength"),
+            bagging_temperature=as_float(params.get("bagging_temperature", 0.0), name="bagging_temperature"),
             loss_function="RMSE",
             random_seed=seed,
             verbose=0,
@@ -473,8 +495,9 @@ def main() -> None:
         "## Winner Ranking",
     ]
     for i, row in winner_df.iterrows():
+        rank = as_int(i, name="winner_rank") + 1
         lines.append(
-            f"{i + 1}. {row['model']} | r2_mean={row['r2_mean']:.4f} | rmse_mean={row['rmse_mean']:.2f} "
+            f"{rank}. {row['model']} | r2_mean={row['r2_mean']:.4f} | rmse_mean={row['rmse_mean']:.2f} "
             f"| mae_mean={row['mae_mean']:.2f} | rmse_worst={row['rmse_worst']:.2f}"
         )
     if not winner_df.empty:

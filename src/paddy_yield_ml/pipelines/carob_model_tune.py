@@ -7,6 +7,7 @@ import itertools
 import json
 import time
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -26,6 +27,20 @@ except NameError:
 OUT_DIR = project_root / "outputs" / "carob_model_tune"
 CANDIDATES_PATH = project_root / "outputs" / "carob_feature_prepare" / "hybrid_selection_candidates.csv"
 DEFAULT_SCENARIO = "modifiable_plus_context"
+
+
+def as_int(value: object, *, name: str) -> int:
+    try:
+        return int(cast("int | float | str", value))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Expected integer-like value for {name}, got {value!r}") from exc
+
+
+def as_float(value: object, *, name: str) -> float:
+    try:
+        return float(cast("int | float | str", value))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Expected float-like value for {name}, got {value!r}") from exc
 
 
 def parse_seeds(raw: str) -> list[int]:
@@ -80,11 +95,11 @@ def build_cat_grid_coarse() -> list[dict[str, object]]:
 
 def refine_xgb_grid(best: dict[str, object]) -> list[dict[str, object]]:
     b = best.copy()
-    lr = float(b["learning_rate"])
-    depth = int(b["max_depth"])
-    mcw = int(b["min_child_weight"])
-    reg = float(b.get("reg_lambda", 1.0))
-    n_est = int(b["n_estimators"])
+    lr = as_float(b["learning_rate"], name="learning_rate")
+    depth = as_int(b["max_depth"], name="max_depth")
+    mcw = as_int(b["min_child_weight"], name="min_child_weight")
+    reg = as_float(b.get("reg_lambda", 1.0), name="reg_lambda")
+    n_est = as_int(b["n_estimators"], name="n_estimators")
 
     candidates = [
         b,
@@ -105,12 +120,12 @@ def refine_xgb_grid(best: dict[str, object]) -> list[dict[str, object]]:
 
 def refine_cat_grid(best: dict[str, object]) -> list[dict[str, object]]:
     b = best.copy()
-    lr = float(b["learning_rate"])
-    depth = int(b["depth"])
-    l2 = float(b["l2_leaf_reg"])
-    rs = float(b.get("random_strength", 1.0))
-    bt = float(b.get("bagging_temperature", 0.0))
-    n_est = int(b["n_estimators"])
+    lr = as_float(b["learning_rate"], name="learning_rate")
+    depth = as_int(b["depth"], name="depth")
+    l2 = as_float(b["l2_leaf_reg"], name="l2_leaf_reg")
+    rs = as_float(b.get("random_strength", 1.0), name="random_strength")
+    bt = as_float(b.get("bagging_temperature", 0.0), name="bagging_temperature")
+    n_est = as_int(b["n_estimators"], name="n_estimators")
 
     candidates = [
         b,
@@ -134,13 +149,13 @@ def refine_cat_grid(best: dict[str, object]) -> list[dict[str, object]]:
 def build_model(model_key: str, params: dict[str, object], seed: int) -> object:
     if model_key == "xgboost":
         return XGBRegressor(
-            n_estimators=int(params["n_estimators"]),
-            learning_rate=float(params["learning_rate"]),
-            max_depth=int(params["max_depth"]),
-            min_child_weight=int(params["min_child_weight"]),
-            subsample=float(params["subsample"]),
-            colsample_bytree=float(params["colsample_bytree"]),
-            reg_lambda=float(params.get("reg_lambda", 1.0)),
+            n_estimators=as_int(params["n_estimators"], name="n_estimators"),
+            learning_rate=as_float(params["learning_rate"], name="learning_rate"),
+            max_depth=as_int(params["max_depth"], name="max_depth"),
+            min_child_weight=as_int(params["min_child_weight"], name="min_child_weight"),
+            subsample=as_float(params["subsample"], name="subsample"),
+            colsample_bytree=as_float(params["colsample_bytree"], name="colsample_bytree"),
+            reg_lambda=as_float(params.get("reg_lambda", 1.0), name="reg_lambda"),
             objective="reg:squarederror",
             random_state=seed,
             n_jobs=-1,
@@ -148,12 +163,12 @@ def build_model(model_key: str, params: dict[str, object], seed: int) -> object:
         )
     if model_key == "catboost":
         return CatBoostRegressor(
-            n_estimators=int(params["n_estimators"]),
-            learning_rate=float(params["learning_rate"]),
-            depth=int(params["depth"]),
-            l2_leaf_reg=float(params["l2_leaf_reg"]),
-            random_strength=float(params.get("random_strength", 1.0)),
-            bagging_temperature=float(params.get("bagging_temperature", 0.0)),
+            n_estimators=as_int(params["n_estimators"], name="n_estimators"),
+            learning_rate=as_float(params["learning_rate"], name="learning_rate"),
+            depth=as_int(params["depth"], name="depth"),
+            l2_leaf_reg=as_float(params["l2_leaf_reg"], name="l2_leaf_reg"),
+            random_strength=as_float(params.get("random_strength", 1.0), name="random_strength"),
+            bagging_temperature=as_float(params.get("bagging_temperature", 0.0), name="bagging_temperature"),
             loss_function="RMSE",
             random_seed=seed,
             verbose=0,
@@ -458,8 +473,9 @@ def main() -> None:
         "## Winner Ranking",
     ]
     for i, row in winner_df.iterrows():
+        rank = as_int(i, name="winner_rank") + 1
         decision_lines.append(
-            f"{i + 1}. {row['model']} | r2_mean={row['r2_mean']:.4f} | rmse_mean={row['rmse_mean']:.2f} "
+            f"{rank}. {row['model']} | r2_mean={row['r2_mean']:.4f} | rmse_mean={row['rmse_mean']:.2f} "
             f"| mae_mean={row['mae_mean']:.2f} | rmse_worst={row['rmse_worst']:.2f}"
         )
     if not winner_df.empty:
