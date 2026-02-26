@@ -31,3 +31,10 @@ outputs/*
 !outputs/baseline/.gitkeep
 !outputs/feature_prepare/
 !outputs/feature_prepare/.gitkeep
+outputs/baseline/*
+!outputs/baseline/.gitkeep
+outputs/feature_prepare/*
+!outputs/feature_prepare/.gitkeep
+
+# Training/runtime artifacts
+catboost_info/

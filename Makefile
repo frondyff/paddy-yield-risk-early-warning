@@ -1,6 +1,6 @@
 UV ?= uv
 
-.PHONY: sync install lock run-baseline run-feature-prepare run-model-compare run-model-select-tune run-ablation-eval run-interpretability-report test lint format typecheck verify clean
+.PHONY: sync install lock run-baseline run-feature-prepare run-model-compare run-model-select-tune run-ablation-eval run-interpretability-report run-causal-pilot run-carob-baseline run-carob-feature-prepare run-carob-model-compare run-carob-causal-pilot test lint format typecheck verify clean
 
 sync:
 	$(UV) sync --all-groups
@@ -11,13 +11,13 @@ lock:
 	$(UV) lock
 
 run-baseline:
-	$(UV) run python src/paddy_yield_ml/pipelines/baseline.py
+	$(UV) run python src/paddy_yield_ml/pipelines/carob_baseline.py
 
 run-feature-prepare:
-	$(UV) run python src/paddy_yield_ml/pipelines/feature_prepare.py
+	$(UV) run python src/paddy_yield_ml/pipelines/carob_feature_prepare.py
 
 run-model-compare:
-	$(UV) run python src/paddy_yield_ml/pipelines/model_compare.py
+	$(UV) run python src/paddy_yield_ml/pipelines/carob_model_compare.py
 
 run-model-select-tune:
 	$(UV) run python src/paddy_yield_ml/pipelines/model_select_tune.py
@@ -27,6 +27,21 @@ run-ablation-eval:
 
 run-interpretability-report:
 	$(UV) run python src/paddy_yield_ml/pipelines/interpretability_report.py
+
+run-causal-pilot:
+	$(UV) run python src/paddy_yield_ml/pipelines/carob_causal_pilot.py
+
+run-carob-baseline:
+	$(UV) run python src/paddy_yield_ml/pipelines/carob_baseline.py
+
+run-carob-feature-prepare:
+	$(UV) run python src/paddy_yield_ml/pipelines/carob_feature_prepare.py
+
+run-carob-model-compare:
+	$(UV) run python src/paddy_yield_ml/pipelines/carob_model_compare.py
+
+run-carob-causal-pilot:
+	$(UV) run python src/paddy_yield_ml/pipelines/carob_causal_pilot.py
 
 test:
 	$(UV) run pytest
