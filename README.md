@@ -1,106 +1,100 @@
-#  Paddy Yield Decision Support Using Enterprise Machine Learning
+# CAROB Rice Decision Support Using Interpretable Enterprise ML
 
-McGill MMA – Enterprise Analytics Group Project
+McGill MMA Enterprise Analytics Group Project
 
+## Project direction
+This repository now uses **CAROB (doi:10.7910/DVN/AMAZXA)** as the primary case for the decision-support framework.
+The former paddy dataset pipelines are kept only as legacy reference and are no longer the core analysis path.
 
-## 1. Enterprise Context
+## Enterprise objective
+Build a reproducible decision-support workflow that can:
+- predict rice yield under trial/site variability,
+- explain predictions with transparent feature logic,
+- produce actionable recommendations with confidence/caveat labels,
+- support causal stretch-goal diagnostics where data structure allows.
 
-Modern agricultural enterprises—such as cooperatives, agribusiness firms, and government agencies—face increasing pressure to:
-- Improve crop yield predictability  
-- Optimize resource usage (fertilizer, land, seed varieties)  
-- Make data-driven decisions under environmental uncertainty  
+## CAROB core pipelines
+- `src/paddy_yield_ml/pipelines/carob_baseline.py`
+- `src/paddy_yield_ml/pipelines/carob_feature_prepare.py`
+- `src/paddy_yield_ml/pipelines/carob_model_compare.py`
+- `src/paddy_yield_ml/pipelines/carob_interpretability.py`
+- `src/paddy_yield_ml/pipelines/carob_rule_causal_aipw.py`
 
-Despite the growing availability of agronomic data, many farming decisions remain:
-- Fragmented across stakeholders  
-- Heavily experience-based  
-- Poorly supported by interpretable and reproducible machine learning systems  
-This project addresses this gap by designing an **enterprise ML decision-support pipeline**, rather than a standalone prediction model.
+## Inputs (CAROB)
+- `data/input/carob_amazxa.csv`
+- `data/metadata/carob_amazxa_meta.csv`
+- `data/metadata/data_dictionary_carob_amazxa.csv`
 
+## Outputs (CAROB)
+- `outputs/carob_baseline/`
+- `outputs/carob_feature_prepare/`
+- `outputs/carob_model_compare/`
+- `outputs/carob_interpretability/`
+- `outputs/carob_rule_causal_aipw/rule_aipw_v2/`
 
-## 2. Data Context
+## Validation philosophy (CAROB)
+- Predictive robustness: Leave-One-Trial-Out grouped evaluation.
+- Feature governance: role-based screening (modifiable/context/proxy) + redundancy review.
+- Causal stretch goal: rule-as-treatment AIPW diagnostics with trial-aware uncertainty checks.
 
-This project uses the **UCI Paddy Dataset**, a real-world agricultural dataset containing:
+## Setup
+```bash
+uv sync --all-groups
+```
 
-- Cultivation practices  
-- Fertilizer usage  
-- Environmental conditions  
-- Paddy varieties  
-- Observed yield outcomes  
+## Run CAROB pipelines
+```bash
+uv run python src/paddy_yield_ml/pipelines/carob_baseline.py
+uv run python src/paddy_yield_ml/pipelines/carob_feature_prepare.py
+uv run python src/paddy_yield_ml/pipelines/carob_model_compare.py
+uv run python src/paddy_yield_ml/pipelines/carob_interpretability.py --run-tag iter3_defensible_v5
+uv run python src/paddy_yield_ml/pipelines/carob_rule_causal_aipw.py --run-tag rule_aipw_v2
+```
 
-From an enterprise analytics perspective, the dataset exhibits:
-- Tabular and heterogeneous features  
-- Observational correlations rather than verified causal relationships  
-- Strong need for feature engineering, explainability, and governance  
+Wrappers:
+```bash
+python scripts/run_carob_baseline.py
+python scripts/run_carob_feature_prepare.py
+python scripts/run_carob_model_compare.py
+python scripts/run_carob_interpretability.py --run-tag iter3_defensible_v5
+python scripts/run_carob_rule_causal_aipw.py --run-tag rule_aipw_v2
+```
 
-These characteristics closely resemble real enterprise data environments.
----
+Make targets:
+```bash
+make run-carob-baseline
+make run-carob-feature-prepare
+make run-carob-model-compare
+make run-carob-interpretability
+make run-carob-rule-causal-aipw
+make help
+```
 
-## 3. Business Problem Statement
+## Legacy (paddy) scope
+Paddy pipelines remain in the repository as legacy reference and compatibility paths.
+They are not the primary analysis flow and should not be used as default project entrypoints.
 
-**How can an enterprise leverage historical agronomic data to support better farming decisions by identifying key yield drivers and generating interpretable insights, while remaining reproducible, explainable, and production-ready?**
+Legacy wrappers and pipelines include:
+- `scripts/run_baseline.py`
+- `scripts/run_feature_prepare.py`
+- `scripts/run_model_compare.py`
+- `scripts/run_model_select_tune.py`
+- `scripts/run_ablation_eval.py`
+- `scripts/run_interpretability_report.py`
+- `scripts/run_causal_pilot.py`
 
-This framing aligns with:
-- The end-to-end machine learning lifecycle  
-- Enterprise analytics best practices  
-- Explainability and trust requirements emphasized in the course  
----
+## Quality checks
+```bash
+make lint
+make format
+make typecheck
+make test
+make verify
+```
 
-## 4. Project Objectives
-
-The objectives of this project are to:
-1. Explore and understand the distribution and key drivers of paddy yield  
-2. Apply feature engineering and selection to improve model stability and generalization  
-3. Compare machine learning models with different accuracy–interpretability trade-offs  
-4. Extract interpretable insights that can inform practical farming decisions  
----
-
-## 5. Research Hypotheses
-
-### Hypothesis 1 — Feature Engineering & Selection  
-Hybrid feature selection methods will outperform models trained on the full raw feature set in terms of predictive performance and generalization.
-
-### Hypothesis 2 — Model Choice vs Interpretability  
-Tree-based ensemble models (e.g., Random Forest, Gradient Boosting) provide a better balance between predictive performance and interpretability than linear or distance-based models for paddy yield prediction.
-
-### Hypothesis 3 — Actionability of ML Outputs  
-Interpretable machine learning models can extract actionable decision rules that meaningfully relate cultivation practices (e.g., fertilizer usage, variety selection) to yield outcomes.
-
-## 6. Exploratory Data Analysis (EDA)
-
-Initial exploratory data analysis focuses on:
-
-- Distribution of paddy yield and variability across observations  
-- Identification of agronomic and environmental features strongly associated with yield  
-- Correlation analysis to inform feature engineering and selection  
-
-The EDA provides an empirical foundation for subsequent modeling while avoiding causal over-interpretation.
-
-
-## 7. Repository Structure
-- data/          Raw and processed datasets
-- notebooks/     EDA, feature engineering, modeling, and evaluation
-- src/           Reusable preprocessing and modeling code
-- results/       Figures, tables, and summarized findings
-- presentation/  Proposal and final presentation slides
-
-## 8. Current Status
-
-- Enterprise context and business framing finalized  
-- Research hypotheses defined  
-- Initial EDA completed  
-- Feature engineering and modeling in progress  
-
-## 9. Team
-
+## Team
 - Abdelaziz Ahmed
 - Frondy Ferdianto
 - Hazel Guan
 - Muhammad Hydarali
-- Simmi Agnihotram 
-
-## 10. Expected Outcomes
-
-- A reproducible end-to-end ML pipeline  
-- Clear comparison of feature selection and model strategies  
-- Interpretable insights linking agronomic practices to yield outcomes  
-- Practical guidance suitable for enterprise decision support  
+- Simmi Agnihotram
