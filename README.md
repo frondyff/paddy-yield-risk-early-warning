@@ -75,6 +75,22 @@ make run-carob-rule-causal-aipw
 make help
 ```
 
+## Rice What-If Yield Advisor (Streamlit)
+Launch the app from repo root:
+
+```bash
+uv run streamlit run streamlit_app.py --server.port 8501
+```
+
+Open `http://localhost:8501`.
+
+Current app behavior:
+- App title: `Rice What-If Yield Advisor`.
+- Numeric context and management controls are slider-based.
+- Operational mode shows prediction, SHAP explanation, and rule guidance.
+- Scientific mode additionally shows rule-level causal diagnostics (AIPW artifacts).
+- Rule table includes associated yield lift (`kg/ha`) per rule.
+
 ## Legacy (paddy) scope
 Paddy pipelines remain in the repository as legacy reference and compatibility paths.
 They are not the primary analysis flow and should not be used as default project entrypoints.

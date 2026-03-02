@@ -53,6 +53,21 @@ uv run python scripts/run_carob_rule_causal_aipw.py --run-tag rule_aipw_v4_extra
 - Legacy paddy scripts are still present but are no longer the project's primary path.
 - Causal outputs are assumption-based and should always be interpreted with caveats.
 
+## UI (Streamlit)
+The interactive app is `streamlit_app.py` at repo root (not a wrapper script).
+
+Run:
+
+```bash
+uv run streamlit run streamlit_app.py --server.port 8501
+```
+
+Current UI contract:
+- Title: `Rice What-If Yield Advisor`
+- Numeric context and modifiable levers use sliders
+- Rule table includes rule-level yield lift (`kg/ha`)
+- Causal evidence is shown only in Scientific mode
+
 ## Legacy wrappers (paddy reference)
 - `run_baseline.py`
 - `run_feature_prepare.py`

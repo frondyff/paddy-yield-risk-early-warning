@@ -1010,7 +1010,13 @@ def render_feature_input(
             default = bool(current_value)
         return st.toggle(label, value=default, help=help_text, key=key)
 
-    if kind == "numeric":
+    numeric_like = (
+        kind == "numeric"
+        or pd.api.types.is_numeric_dtype(reference_all)
+        or _is_numeric_like(reference_all)
+        or _is_numeric_like(reference_country)
+    )
+    if numeric_like:
         lo, hi = _numeric_bounds(reference_all)
         country_num = pd.to_numeric(reference_country, errors="coerce").dropna()
         all_num = pd.to_numeric(reference_all, errors="coerce").dropna()
