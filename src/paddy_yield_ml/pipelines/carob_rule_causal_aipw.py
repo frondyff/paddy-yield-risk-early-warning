@@ -24,7 +24,7 @@ except NameError:
     project_root = Path.cwd()
 
 OUT_ROOT = project_root / "outputs" / "carob_rule_causal_aipw"
-DEFAULT_INTERP_DIR = project_root / "outputs" / "carob_interpretability" / "iter3_defensible_v5"
+DEFAULT_INTERP_DIR = project_root / "outputs" / "carob_interpretability" / "iter5_extratrees_shap_only_v1"
 DEFAULT_SEEDS = "42,52,62"
 DEFAULT_PRIMARY_STATUSES = "works_here"
 DEFAULT_SECONDARY_STATUSES = "conflicts_here,unstable_or_small_effect"
