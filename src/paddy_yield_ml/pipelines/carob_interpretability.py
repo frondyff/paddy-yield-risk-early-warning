@@ -461,7 +461,12 @@ def compute_pdp_curve(
 ) -> pd.DataFrame:
     grid = numeric_grid(x_ref[feature], n_points=n_points)
     if len(grid) < 2:
-        return pd.DataFrame(columns=["x", "pdp_centered"])
+        return pd.DataFrame(
+            {
+                "x": pd.Series(dtype=float),
+                "pdp_centered": pd.Series(dtype=float),
+            }
+        )
     cat_idx = [x_ref.columns.get_loc(c) for c in cat_cols]
     means: list[float] = []
     for val in grid:
@@ -485,10 +490,22 @@ def compute_ale_curve(
     vals = pd.to_numeric(x_ref[feature], errors="coerce")
     vals = vals.dropna()
     if len(vals) < 20:
-        return pd.DataFrame(columns=["x", "ale_centered", "support_count"])
+        return pd.DataFrame(
+            {
+                "x": pd.Series(dtype=float),
+                "ale_centered": pd.Series(dtype=float),
+                "support_count": pd.Series(dtype=int),
+            }
+        )
     edges = np.unique(np.quantile(vals.to_numpy(dtype=float), np.linspace(0.0, 1.0, int(n_bins) + 1)))
     if len(edges) < 3:
-        return pd.DataFrame(columns=["x", "ale_centered", "support_count"])
+        return pd.DataFrame(
+            {
+                "x": pd.Series(dtype=float),
+                "ale_centered": pd.Series(dtype=float),
+                "support_count": pd.Series(dtype=int),
+            }
+        )
 
     cat_idx = [x_ref.columns.get_loc(c) for c in cat_cols]
     effects: list[float] = []
@@ -522,7 +539,13 @@ def compute_ale_curve(
         counts.append(int(len(idx)))
 
     if not effects:
-        return pd.DataFrame(columns=["x", "ale_centered", "support_count"])
+        return pd.DataFrame(
+            {
+                "x": pd.Series(dtype=float),
+                "ale_centered": pd.Series(dtype=float),
+                "support_count": pd.Series(dtype=int),
+            }
+        )
 
     ale_vals = np.cumsum(np.array(effects, dtype=float))
     w = np.array(counts, dtype=float)
@@ -680,7 +703,7 @@ def extract_modifiable_rules(
     if out.empty:
         raise RuntimeError("No qualifying rules found.")
     out = out.sort_values(["support_pct", "actual_lift_vs_global"], ascending=[False, False]).reset_index(drop=True)
-    out.insert(0, "rule_id", [f"R{i}" for i in range(1, len(out) + 1)])
+    out.insert(0, "rule_id", np.array([f"R{i}" for i in range(1, len(out) + 1)], dtype=object))
     return out.head(max(8, int(n_rules))).copy()
 
 

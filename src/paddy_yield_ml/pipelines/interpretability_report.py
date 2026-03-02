@@ -388,7 +388,7 @@ def extract_modifiable_rules(
         ["predicted_lift_vs_global", "support_count"],
         ascending=[False, False],
     ).reset_index(drop=True)
-    rules_df.insert(0, "rule_id", [f"R{i}" for i in range(1, len(rules_df) + 1)])
+    rules_df.insert(0, "rule_id", np.array([f"R{i}" for i in range(1, len(rules_df) + 1)], dtype=object))
     return rules_df.head(max(n_rules, 5)).copy()
 
 

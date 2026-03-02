@@ -233,7 +233,15 @@ def proxy_leakage_audit(df: pd.DataFrame) -> pd.DataFrame:
 def high_correlation_pairs(df: pd.DataFrame, threshold: float = 0.97) -> pd.DataFrame:
     num_cols = [c for c in df.select_dtypes(include=[np.number, "boolean"]).columns if c != cc.TARGET_COL]
     if len(num_cols) < 2:
-        out = pd.DataFrame(columns=["feature_1", "feature_2", "corr", "high_corr_flag", "drop_candidate"])
+        out = pd.DataFrame(
+            {
+                "feature_1": pd.Series(dtype="string"),
+                "feature_2": pd.Series(dtype="string"),
+                "corr": pd.Series(dtype=float),
+                "high_corr_flag": pd.Series(dtype=bool),
+                "drop_candidate": pd.Series(dtype="string"),
+            }
+        )
         out.to_csv(OUT_DIR / "high_correlation_pairs.csv", index=False)
         return out
 
@@ -443,7 +451,8 @@ def build_actionability_split(role_map: pd.DataFrame, proxy_df: pd.DataFrame) ->
     summary = (
         out.groupby(["feature_group", "final_role"], dropna=False)
         .size()
-        .reset_index(name="n_features")
+        .to_frame("n_features")
+        .reset_index()
         .sort_values(["feature_group", "final_role"])
     )
     summary.to_csv(OUT_DIR / "actionability_role_summary.csv", index=False)

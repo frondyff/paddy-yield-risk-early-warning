@@ -203,7 +203,14 @@ def detect_hectare_coupled_numeric_features(
     corr_threshold: float,
 ) -> pd.DataFrame:
     if fp.SIZE_COL not in frame.columns:
-        return pd.DataFrame(columns=["feature", "within_hectare_max_unique", "corr_with_hectares", "size_coupled_flag"])
+        return pd.DataFrame(
+            {
+                "feature": pd.Series(dtype="string"),
+                "within_hectare_max_unique": pd.Series(dtype=int),
+                "corr_with_hectares": pd.Series(dtype=float),
+                "size_coupled_flag": pd.Series(dtype=bool),
+            }
+        )
 
     hectares = pd.to_numeric(frame[fp.SIZE_COL], errors="coerce")
     rows: list[dict[str, Any]] = []
