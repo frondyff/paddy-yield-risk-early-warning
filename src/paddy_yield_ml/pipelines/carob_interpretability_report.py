@@ -166,7 +166,12 @@ def save_outputs(
     role_df = (
         pd.read_csv(role_map_path)
         if role_map_path.exists()
-        else pd.DataFrame(columns=["column_name", "final_role"])
+        else pd.DataFrame(
+            {
+                "column_name": pd.Series(dtype="string"),
+                "final_role": pd.Series(dtype="string"),
+            }
+        )
     )
     role_lookup = role_df.set_index("column_name")["final_role"].to_dict() if not role_df.empty else {}
 

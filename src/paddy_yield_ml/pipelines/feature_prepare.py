@@ -935,7 +935,8 @@ def build_actionability_split(
     role_summary = (
         out.groupby(["feature_group", "final_role"], dropna=False)["column_name"]
         .count()
-        .reset_index(name="n_features")
+        .to_frame("n_features")
+        .reset_index()
         .sort_values(["feature_group", "final_role"])
     )
     role_summary.to_csv(OUT_DIR / "actionability_role_summary.csv", index=False)

@@ -843,7 +843,16 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     if not balance_df.empty:
         balance_df.to_csv(out_dir / "pair_balance_smd.csv", index=False)
     else:
-        pd.DataFrame(columns=["rule_id", "country", "seed", "feature", "smd_before", "smd_after"]).to_csv(
+        pd.DataFrame(
+            {
+                "rule_id": pd.Series(dtype="string"),
+                "country": pd.Series(dtype="string"),
+                "seed": pd.Series(dtype=int),
+                "feature": pd.Series(dtype="string"),
+                "smd_before": pd.Series(dtype=float),
+                "smd_after": pd.Series(dtype=float),
+            }
+        ).to_csv(
             out_dir / "pair_balance_smd.csv",
             index=False,
         )
@@ -861,7 +870,13 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     if skip_rows:
         pd.DataFrame(skip_rows).to_csv(out_dir / "pair_skips.csv", index=False)
     else:
-        pd.DataFrame(columns=["rule_id", "country", "reason"]).to_csv(out_dir / "pair_skips.csv", index=False)
+        pd.DataFrame(
+            {
+                "rule_id": pd.Series(dtype="string"),
+                "country": pd.Series(dtype="string"),
+                "reason": pd.Series(dtype="string"),
+            }
+        ).to_csv(out_dir / "pair_skips.csv", index=False)
 
     runlog = [
         f"run_tag={args.run_tag}",
