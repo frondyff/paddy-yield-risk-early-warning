@@ -36,22 +36,14 @@
 **What we did:** Enforced diagnostics and decision gates (CI, seed sign stability, overlap, post-weighting SMD, trial diversity).  
 **Residual risk:** Effect estimates remain fragile in low-overlap or sparse-arm settings.  
 **Next step:** Use controlled pilots with pre-registered criteria and only promote pairs that clear all gates.
-
-### 6) Single Split / Single Seed Evaluation
-**What happened:** Model comparison and tuning use one fixed trial-aware split (60/20/20, seed 42); multi-seed checks vary model randomness more than trial membership.  
-**Why this matters:** With only 13 trials in test, one split can inflate or deflate performance materially; point estimates may be unstable.  
-**What we did:** Used group-aware splitting and reported seed-level variability as a stability proxy.  
-**Residual risk:** Seed-level variance is not split-level variance.  
-**Next step:** Run repeated GroupShuffleSplit (10-20 splits) and report distributions for R2, RMSE, and MAE.
-
-### 7) Non-Random Trial Exclusion
+### 6) Non-Random Trial Exclusion
 **What happened:** Trials 7, 14, 15, and 19 were excluded because soil_P and/or soil_pH were fully missing at trial level.  
 **Why this matters:** Fully missing trials may be systematically different (for example lower-resource environments), so exclusions may reduce generalizability and bias estimates.  
 **What we did:** Kept exclusion logic explicit and auditable in feature-preparation outputs.  
 **Residual risk:** Exclusion rationale is defensible but impact on conclusions is not fully bounded.  
 **Next step:** Re-run predictive and causal analyses under alternative inclusion/imputation strategies and compare stability.
 
-### 8) MCAR Imputation Assumption
+### 7) MCAR Imputation Assumption
 **What happened:** Missing values were imputed using trial-level medians with global train medians as fallback, which assumes missingness is non-informative.  
 **Why this matters:** If missingness is related to outcome/context quality (MAR/MNAR), imputation can bias fit and feature importance.  
 **What we did:** Computed imputations from training data only and prioritized trial-level medians to reduce leakage.  
@@ -86,3 +78,4 @@ For high-missing features, verify whether missingness itself predicts yield; if 
 
 ## Final Reflective Statement
 The project matured from prediction-first experimentation to governance-aware, context-conditional decision support. Predictive performance is meaningful, interpretability is operational, and causal diagnostics are decision-useful. However, deployment-grade causal confidence has not yet been achieved. The appropriate near-term strategy is controlled, country-specific pilots with strict promotion gates, not broad rollout.
+
